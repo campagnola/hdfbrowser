@@ -29,7 +29,13 @@ class HdfBrowser(QtGui.QSplitter):
         self.data_view = HdfDataView()
         self.right_split.addWidget(self.data_view)
 
-        self.console = pg.console.ConsoleWidget()
+        self.console = pg.console.ConsoleWidget(text="""
+        Console variables:
+          hdf : the currently loaded h5py file object
+          sel : the currently selected object from the browser tree
+
+        Double-click on a tree item to paste its variable name into the console input.
+        """)
         self.right_split.addWidget(self.console)
 
         self.setSizes([200, 800])
