@@ -59,7 +59,10 @@ class HdfBrowser(QtGui.QSplitter):
             self.console.localNamespace['sel'] = None
         else:
             self.meta_table.set_hdf(sel[0].hdf)
-            self.data_view.set_hdf(sel[0].hdf)
+            try:
+                self.data_view.set_hdf(sel[0].hdf)
+            except Exception:
+                sys.excepthook(*sys.exc_info())
             self.console.localNamespace['sel'] = sel[0].hdf
 
     def tree_item_double_clicked(self, item, col):
@@ -137,6 +140,10 @@ class HdfMetaTable(pg.DataTreeWidget):
         if isinstance(hdf, h5py.Dataset):
             meta['dtype'] = hdf.dtype
             meta['shape'] = hdf.shape
+            meta['chunks'] = hdf.chunks
+            meta['compression'] = hdf.compression
+            meta['compression_opts'] = hdf.compression_opts
+            meta['scaleoffset'] = hdf.scaleoffset
 
         attrs = {}
         for k in hdf.attrs:
