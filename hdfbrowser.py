@@ -3,19 +3,25 @@ from collections import OrderedDict
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.console
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 import h5py
 import hdf5
 
+# changed in PyQt6
+if 'Horizontal' not in dir(QtCore.Qt):
+    QtCore.Qt.Horizontal = QtCore.Qt.Orientation.Horizontal
+    QtCore.Qt.Vertical = QtCore.Qt.Orientation.Vertical
 
-class HdfBrowser(QtGui.QSplitter):
+
+class HdfBrowser(QtWidgets.QSplitter):
     def __init__(self):
-        QtGui.QSplitter.__init__(self, QtCore.Qt.Horizontal)
+        # Use Qt::Horizontal
+        QtWidgets.QSplitter.__init__(self, QtCore.Qt.Horizontal)
 
-        self.left_split = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.left_split = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self.addWidget(self.left_split)
 
-        self.right_split = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.right_split = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self.addWidget(self.right_split)
 
         self.tree = HdfTree()
@@ -164,13 +170,13 @@ class HdfMetaTable(pg.DataTreeWidget):
         self.setData(meta)
 
 
-class HdfDataView(QtGui.QStackedWidget):
+class HdfDataView(QtWidgets.QStackedWidget):
     def __init__(self):
-        QtGui.QStackedWidget.__init__(self)
+        QtWidgets.QStackedWidget.__init__(self)
         self.widgets = {}
-        self.widgets['empty'] =  QtGui.QWidget()
+        self.widgets['empty'] =  QtWidgets.QWidget()
         self.widgets['table'] = pg.TableWidget()
-        self.widgets['text'] = QtGui.QTextBrowser()
+        self.widgets['text'] = QtWidgets.QTextBrowser()
         self.widgets['plot'] = pg.PlotWidget()
         self.widgets['image'] = pg.ImageView()
 
@@ -227,7 +233,7 @@ if __name__ == '__main__':
 
     if filename is None:
         filters = "HDF5 files (*.h5);;All files (*.*)"
-        filename = str(pg.Qt.QtGui.QFileDialog.getOpenFileName(None, "Open HDF5 file", default_path, filters))
+        filename = str(pg.Qt.QtWidgets.QFileDialog.getOpenFileName(None, "Open HDF5 file", default_path, filters))
         if filename == '':
             sys.exit(0)
     
@@ -237,5 +243,8 @@ if __name__ == '__main__':
     browser.tree.expand_all()
 
     if sys.flags.interactive == 0:
-        app.exec_()
+        try:
+            app.exec_()
+        except AttributeError:
+            app.exec()
 
